@@ -68,4 +68,25 @@ void display_board(const char board[9][9]) {
   print_frame(9);
 }
 
-/* add your functions here */
+/* function which returns true if all Sudoku board positions are occupied by digits, and false otherwise.  N.B: no check for whether digits are logically valid. */
+bool is_complete(char board[9][9]) {
+  for (int r=0; r<9; r++) // for each row
+    {
+      for (int c=0; c<9; c++) // for each column
+	{
+	  if (!isdigit(board[r][c]))  
+	    return false;  // returns false if position does not hold a digit
+	}
+    }
+  return true; // returns true if all of the columns and rows have been tested and all contain digits
+}
+//TEST FUNCTION ON BOUNDARIES - MISSING VALUES IN COLUMNS AND ROWS 0 AND 9
+
+/*
+bool make_move(char position[2], int digit, char board[9][9])
+{
+  if(digit > 9 || digit < 1)
+    return false; // tests that digit is an appropriate value (i.e. between 1 and 9)
+
+}
+*/
