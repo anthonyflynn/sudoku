@@ -33,7 +33,6 @@ int main() {
     cout << "NOT ";
   cout << "complete." << endl << endl;
 
-  /*
   cout << "====================== Question 2 ======================" << endl << endl;
 
   load_board("easy.dat", board);
@@ -46,7 +45,7 @@ int main() {
   display_board(board);
 
 	// write more tests
-
+  /*
   cout << "====================== Question 3 ======================" << endl << endl;
 
   load_board("easy.dat", board);
