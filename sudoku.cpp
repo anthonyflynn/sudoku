@@ -83,40 +83,13 @@ bool is_complete(char board[9][9]) {
 //TEST FUNCTION ON BOUNDARIES - MISSING VALUES IN COLUMNS AND ROWS 0 AND 9
 
 
-bool make_move(const char *position, char digit, char board[9][9]) // SHOULD POSITION BE 2 OR 3?  3 GIVEN '\0' AT END?
+bool make_move(const char *position, char digit, char board[9][9])
 {
   int row = position[0] - 'A'; // Converts the first char in position to row array index
   int column = position[1] - '1'; // Converts the second char in position to column array index
 
-  if (static_cast<int>(digit) > 57 || static_cast<int>(digit) < 49) // 49 is the ASCII value for character 1, 57 is the ASCII character for 9 
-    return false; // tests that digit is an appropriate value (i.e. between 1 and 9)
-
-  if ((row > 8 || row < 0) || (column > 8 || column < 0)) // tests coordinates not out of range
+  if (!check_valid(row, column, digit, board))
     return false;
-
-  for (int c = 0; c < 9; c++) // tests digit does not appear in the same column
-    {
-      if (board[row][c] == digit)
-	return false;
-    }
-
-  for (int r = 0; r < 9; r++) // tests digit does not appear in the same row
-    {
-      if (board[r][column] == digit)
-	return false;
-    }
-
-  int box_row = (row / 3) * 3; // converts row to a value or either 0, 3 or 6 to test box
-  int box_column = (column / 3) * 3; // converts column to a value or either 0, 3 or 6 to test box
-
-  for (int r = box_row; r < (box_row + 3); r++)
-    {
-      for (int c = box_column; c < (box_column + 3); c++)
-	{
-	  if (board[r][c] == digit)
-	    return false;
-	}
-    }
 
   board[row][column] = digit;
   return true;
@@ -141,14 +114,86 @@ bool save_board(const char *filename, char board[9][9]) {
 
 
 
-
-
-
-
-
-bool solve_board(char board[9][9])
+bool solve_board(char board[9][9]) // tests coordinates not out of range
 {
   char test_number = '1';
   const char *test_position = "A1";
   make_move(test_position, test_number, board);
 } 
+
+
+
+bool invalid_digit(char digit) // returns true if the digit is invalid (i.e. not between 1 and 9)
+{
+  if (static_cast<int>(digit) > 57 || static_cast<int>(digit) < 49) // '1' = 49 (ASCII), '9' = 57 (ASCII)
+    return true;
+  else
+    return false;
+}
+
+
+bool out_of_range(int row, int column) // returns true if test coordinate is out of range
+{
+  if ((row > 8 || row < 0) || (column > 8 || column < 0))
+    return true;
+  else
+    return false;
+}
+
+bool duplicate_digit_in_row(int row, char digit, char board[9][9]) // returns true if digit already appears in the same row
+{
+  for (int c = 0; c < 9; c++)
+    {
+      if (board[row][c] == digit)
+	return true;
+    }
+  return false;
+}
+
+bool duplicate_digit_in_column(int column, char digit, char board[9][9]) // returns true if digit already appears in the same column
+{
+  for (int r = 0; r < 9; r++)
+    {
+      if (board[r][column] == digit)
+	return true;
+    }
+  return false;
+}
+
+bool duplicate_digit_in_box(int row, int column, char digit, char board[9][9]) // returns true if digit already appears in the same 3x3 box
+{
+  row = (row / 3) * 3; // converts row to a value of either 0, 3 or 6 to test box
+  column = (column / 3) * 3; // converts column to a value of either 0, 3 or 6 to test box
+
+  for (int r = row; r < (row + 3); r++)
+    {
+      for (int c = column; c < (column + 3); c++)
+	{
+	  if (board[r][c] == digit)
+	    return true;
+	}
+    }
+  return false;
+
+}
+
+bool check_valid(int row, int column, char digit, char board[9][9])
+{
+  if (invalid_digit(digit))
+    return false;
+
+  if(out_of_range(row, column))
+    return false;
+
+  if(duplicate_digit_in_row(row, digit, board))
+    return false;
+
+  if(duplicate_digit_in_column(column, digit, board))
+    return false;
+
+  if(duplicate_digit_in_box(row, column, digit, board))
+    return false;
+
+  return true;
+
+}
