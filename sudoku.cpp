@@ -109,11 +109,11 @@ bool make_move(const char *position, char digit, char board[9][9]) // SHOULD POS
   int box_row = (row / 3) * 3; // converts row to a value or either 0, 3 or 6 to test box
   int box_column = (column / 3) * 3; // converts column to a value or either 0, 3 or 6 to test box
 
-  for(int r = box_row; r < (box_row + 3); r++)
+  for (int r = box_row; r < (box_row + 3); r++)
     {
-      for(int c = box_column; c < (box_column + 3); c++)
+      for (int c = box_column; c < (box_column + 3); c++)
 	{
-	  if(board[r][c] == digit)
+	  if (board[r][c] == digit)
 	    return false;
 	}
     }
@@ -123,4 +123,32 @@ bool make_move(const char *position, char digit, char board[9][9]) // SHOULD POS
 
 }
 
+bool save_board(const char *filename, char board[9][9]) {
+  ofstream out(filename);
+  if (!out)
+    return false;  // No assert as no need to exit the program if the file save not successful
 
+  int row = 0;
+  while (out && row < 9) {
+    for (int n=0; n<9; n++)
+      out.put(board[row][n]); // No assert as no need to exit the program if the file save not successful
+    out.put('\n');
+    row++;
+  }
+  // NEED TO CHECK 9 COLUMNS?  HOW DO WE TEST THAT THIS IS A TRUE COPY WITHIN THE CODE?
+  return ((row == 9) ? true : false);
+}
+
+
+
+
+
+
+
+
+bool solve_board(char board[9][9])
+{
+  char test_number = '1';
+  const char *test_position = "A1";
+  make_move(test_position, test_number, board);
+} 

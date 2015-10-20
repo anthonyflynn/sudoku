@@ -45,7 +45,7 @@ int main() {
   display_board(board);
 
 	// write more tests
-  /*
+  
   cout << "====================== Question 3 ======================" << endl << endl;
 
   load_board("easy.dat", board);
@@ -55,6 +55,9 @@ int main() {
     cout << "Save board failed." << endl;
   cout << endl;
 
+  // write tests for this
+
+  /*
   cout << "====================== Question 4 ======================" << endl << endl;
 
   load_board("easy.dat", board);
