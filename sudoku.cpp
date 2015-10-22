@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cassert>
+#include <cstdlib>
 #include "sudoku.h"
 
 using namespace std;
@@ -114,14 +115,69 @@ bool save_board(const char *filename, char board[9][9]) {
 
 
 
-bool solve_board(char board[9][9]) // tests coordinates not out of range
+bool solve_board(char board[9][9])
 {
-  char test_number = '1';
-  const char *test_position = "A1";
-  make_move(test_position, test_number, board);
-} 
+  Node_ptr possible_values[9][9];
+  make_null(possible_values);  // sets all pointers to an initial value of NULL:
+
+  calculate_possible_values(possible_values, board); // calculates all possible values for each square based on numbers currently placed on board
+
+  //print_possible_values(possible_values); // consider changing the names here and in fuction declarations / definitions
+
+  //find_and_delete_node(possible_values[0][0],'1');
+
+  //remove_values_from_peers - this is supposed to remove a value from squares peers if that square has only one possible value 
+
+  
+  if(is_complete(board))
+    {
+      save_board("easy-solution-AF.dat", board);
+      return true;
+    }
+  
+
+  int row(0), column(0);
+  while(isdigit(board[row][column]) && row < 9)
+    {
+      row++;
+      if(row == 9 && column < 9)
+	{
+	  row = 0;
+	  column++;
+	}
+    }
+  
+  char position[] = {row + 'A', column + '1'};
+  
+  char attempt = '1';
+  while(attempt <= '9')
+    {
+      if(make_move(position, attempt, board))
+	{
+	  if(solve_board(board))
+	     return true;
+	}
+      attempt++;
+    }
+
+  if(attempt > '9')
+    {
+      board[row][column] = '.';
+      return false;
+    }
 
 
+
+
+
+
+
+
+  //REMEMBER TO DELETE ELEMENTS IN LINKED LIST WHEN FINISHED USING
+
+
+  return true;
+}
 
 bool invalid_digit(char digit) // returns true if the digit is invalid (i.e. not between 1 and 9)
 {
@@ -130,7 +186,6 @@ bool invalid_digit(char digit) // returns true if the digit is invalid (i.e. not
   else
     return false;
 }
-
 
 bool out_of_range(int row, int column) // returns true if test coordinate is out of range
 {
@@ -174,7 +229,6 @@ bool duplicate_digit_in_box(int row, int column, char digit, char board[9][9]) /
 	}
     }
   return false;
-
 }
 
 bool check_valid(int row, int column, char digit, char board[9][9])
@@ -195,5 +249,126 @@ bool check_valid(int row, int column, char digit, char board[9][9])
     return false;
 
   return true;
+}
+
+Node_ptr assign_new_node(const char digit)
+{
+  Node_ptr new_node = new (nothrow) Node;
+  if(new_node == NULL)
+    {
+      cout << "Error - no more memory left to assign Nodes";
+      exit(1);
+    }
+  new_node -> value = digit;
+  new_node -> ptr_to_next_node = NULL;
+}
+
+void add_to_rear(Node_ptr &front, const char digit)
+{
+  Node_ptr new_last_node = assign_new_node(digit);
+  Node_ptr previous_last_node = front;
+  
+  if (!front) // i.e. if there are no Nodes currently in the list
+    {
+      front = new_last_node;
+      return;
+    }
+
+  // default case for existing list:
+  while((previous_last_node -> ptr_to_next_node) != NULL)
+    previous_last_node = previous_last_node -> ptr_to_next_node;
+
+  previous_last_node -> ptr_to_next_node = new_last_node;
+}
+
+void find_and_delete_node(Node_ptr &front, char digit) // finds a Node with a particular value and deletes it from that linked list (if it exists)
+{
+  Node_ptr node_before = front, node_to_delete = front;
+  
+  while(node_to_delete != NULL)
+    {
+      if(digit == (node_to_delete -> value))
+	{
+	  if(node_to_delete == front)
+	    front = node_to_delete -> ptr_to_next_node;
+	  else
+	    node_before -> ptr_to_next_node = node_to_delete -> ptr_to_next_node;
+	  delete node_to_delete;
+	  return;
+	}
+      node_before = node_to_delete;
+      node_to_delete = node_to_delete -> ptr_to_next_node;
+    }
+}
+
+
+void print_linked_list(const Node_ptr front)
+{
+  for (Node_ptr current = front; current; current = current -> ptr_to_next_node)
+    {
+      cout << current -> value;
+    }
+}
+
+void print_possible_values(Node_ptr possible_values[9][9])
+{
+  for(int r=0; r<9; r++)
+    {
+      for(int c=0; c<9; c++)
+	{
+	  print_linked_list(possible_values[r][c]);
+	  cout << " ";
+	}
+      cout << endl;
+    }  
+}
+
+void make_null(Node_ptr array[9][9])
+{
+  for(int r=0; r<9; r++)
+    for(int c=0; c<9; c++)
+      array[r][c] = NULL;
+}
+
+void calculate_possible_values(Node_ptr possible_values[9][9], char board[9][9])
+{
+  for(int r=0; r<9; r++)
+    {
+      for(int c=0; c<9; c++)
+	{
+	  if(isdigit(board[r][c]))
+	    add_to_rear(possible_values[r][c], board[r][c]);
+	  else
+	    {
+	      char test_value = '1';
+	      while(test_value <= '9')
+		{
+		  if(check_valid(r, c, test_value, board))
+		    {
+		      add_to_rear(possible_values[r][c], test_value);
+		    }
+		  test_value++;
+		}
+	    }
+	}
+    }
+}
+
+
+/*
+void remove_values_from_peers(Node_ptr possible_values[9][9])
+{
+  char test;
+  int row(0), column(0);
+
+  while(possible_values[r][c] != NULL)
+    {
+      test = possible_values -> value;
 
 }
+*/
+
+
+
+
+//FOR ALL FUNCTION DECLARATIONS, NEED TO CHANGE 2D ARRAYS WITH [9][9] to [9][] AND INCLUDE THE OTHER DIMENSION AS A SEPARATE VARIABLE

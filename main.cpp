@@ -48,16 +48,22 @@ int main() {
   
   cout << "====================== Question 3 ======================" << endl << endl;
 
-  load_board("easy.dat", board);
+  load_board("mystery1.dat", board);
+  display_board(board);
+  /*
   if (save_board("easy-copy.dat", board))
     cout << "Save board to 'easy-copy.dat' successful." << endl;
   else
     cout << "Save board failed." << endl;
   cout << endl;
-
+  */
   // write tests for this
 
+  solve_board(board);
+  display_board(board);
+
   /*
+
   cout << "====================== Question 4 ======================" << endl << endl;
 
   load_board("easy.dat", board);
