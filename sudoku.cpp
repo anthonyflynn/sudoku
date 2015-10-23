@@ -117,10 +117,11 @@ bool save_board(const char *filename, char board[9][9]) {
 
 bool solve_board(char board[9][9])
 {
-  Node_ptr possible_values[9][9];
-  make_null(possible_values);  // sets all pointers to an initial value of NULL:
+  //Node_ptr possible_values[9][9];
+  int row(0), column(0);
+  //make_null(possible_values);  // sets all pointers to an initial value of NULL:
 
-  calculate_possible_values(possible_values, board); // calculates all possible values for each square based on numbers currently placed on board
+  //calculate_possible_values(possible_values, board); // calculates all possible values for each square based on numbers currently placed on board
 
   //print_possible_values(possible_values); // consider changing the names here and in fuction declarations / definitions
 
@@ -134,21 +135,16 @@ bool solve_board(char board[9][9])
       save_board("easy-solution-AF.dat", board);
       return true;
     }
-  
 
-  int row(0), column(0);
-  while(isdigit(board[row][column]) && row < 9)
-    {
-      row++;
-      if(row == 9 && column < 9)
-	{
-	  row = 0;
-	  column++;
-	}
-    }
+  get_next_empty_square(row, column, board);
+  
+  //if(row < 0 || column < 0 || row > 8 || column > 8)
+  //exit(1);
   
   char position[] = {row + 'A', column + '1'};
   
+  //cout << possible_values[row][column] -> value;
+  //char attempt = possible_values[row][column] -> value;
   char attempt = '1';
   while(attempt <= '9')
     {
@@ -165,10 +161,6 @@ bool solve_board(char board[9][9])
       board[row][column] = '.';
       return false;
     }
-
-
-
-
 
 
 
@@ -354,6 +346,20 @@ void calculate_possible_values(Node_ptr possible_values[9][9], char board[9][9])
     }
 }
 
+void get_next_empty_square(int &row, int &column, char board[9][9])
+{
+  while(isdigit(board[row][column]) && row < 9)
+    {
+      row++;
+      if(row == 9 && column < 9)
+	{
+	  row = 0;
+	  column++;
+	}
+      //cout << row <<  column << " "; // for testing
+    }
+}
+
 
 /*
 void remove_values_from_peers(Node_ptr possible_values[9][9])
@@ -372,3 +378,6 @@ void remove_values_from_peers(Node_ptr possible_values[9][9])
 
 
 //FOR ALL FUNCTION DECLARATIONS, NEED TO CHANGE 2D ARRAYS WITH [9][9] to [9][] AND INCLUDE THE OTHER DIMENSION AS A SEPARATE VARIABLE
+
+
+//DO UNIT TESTS FOR ALL OF THE INDIVIDUAL FUNCTIONS

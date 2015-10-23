@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <ctime> // for calculating calculation speed
 #include "sudoku.h"
 
 using namespace std;
@@ -9,6 +10,8 @@ int main() {
   char board[9][9];
 
   /* This section illustrates the use of the pre-supplied helper functions. */
+
+  /*
   cout << "============== Pre-supplied functions ==================" << endl << endl;
 
   cout << "Calling load_board():" << endl;
@@ -48,32 +51,33 @@ int main() {
   
   cout << "====================== Question 3 ======================" << endl << endl;
 
-  load_board("mystery1.dat", board);
+  load_board("easy.dat", board);
   display_board(board);
-  /*
+  
   if (save_board("easy-copy.dat", board))
     cout << "Save board to 'easy-copy.dat' successful." << endl;
   else
     cout << "Save board failed." << endl;
   cout << endl;
-  */
+  
   // write tests for this
 
-  solve_board(board);
-  display_board(board);
-
-  /*
-
+  */
   cout << "====================== Question 4 ======================" << endl << endl;
 
   load_board("easy.dat", board);
+  display_board(board);
+  int start_s = clock(); // for calculating speed of execution
   if (solve_board(board)) {
     cout << "The 'easy' board has a solution:" << endl;
     display_board(board);
   } else 
     cout << "A solution cannot be found." << endl;
+  int stop_s = clock(); // for calculating speed of execution
+  cout << "Execution time: " << (stop_s - start_s) / double(CLOCKS_PER_SEC)*1000;
   cout << endl;
-
+  
+  /*
   load_board("medium.dat", board);
   if (solve_board(board)) {
     cout << "The 'medium' board has a solution:" << endl;
@@ -87,7 +91,7 @@ int main() {
   cout << "====================== Question 5 ======================" << endl << endl;
 
 	// write more tests
-  */
 
+	*/
   return 0;
 }

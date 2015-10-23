@@ -27,3 +27,4 @@ void print_linked_list(const Node_ptr front);
 void print_possible_values(Node_ptr possible_values[9][9]);
 void make_null(Node_ptr array[9][9]);
 void calculate_possible_values(Node_ptr possible_values[9][9], char board[9][9]);
+void get_next_empty_square(int &row, int &column, char board[9][9]);
