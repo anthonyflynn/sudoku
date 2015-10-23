@@ -62,36 +62,77 @@ int main() {
   
   // write tests for this
 
-  */
+  
   cout << "====================== Question 4 ======================" << endl << endl;
 
+  */
+
   load_board("easy.dat", board);
-  display_board(board);
-  int start_s = clock(); // for calculating speed of execution
+  //display_board(board);
+  int start_easy = clock(); // for calculating speed of execution
   if (solve_board(board)) {
     cout << "The 'easy' board has a solution:" << endl;
-    display_board(board);
+    //display_board(board);
   } else 
     cout << "A solution cannot be found." << endl;
-  int stop_s = clock(); // for calculating speed of execution
-  cout << "Execution time: " << (stop_s - start_s) / double(CLOCKS_PER_SEC)*1000;
-  cout << endl;
-  
-  /*
+  int stop_easy = clock(); // for calculating speed of execution
+
   load_board("medium.dat", board);
+  //display_board(board);
+  int start_med = clock(); // for calculating speed of execution
   if (solve_board(board)) {
     cout << "The 'medium' board has a solution:" << endl;
-    display_board(board);
+    //display_board(board);
   } else 
     cout << "A solution cannot be found." << endl;
-  cout << endl;
+  int stop_med = clock(); // for calculating speed of execution
+
+  load_board("mystery1.dat", board);
+  //display_board(board);
+  int start_mys1 = clock(); // for calculating speed of execution
+  if (solve_board(board)) {
+    cout << "The 'mystery1' board has a solution:" << endl;
+    //display_board(board);
+  } else 
+    cout << "A solution cannot be found." << endl;
+  int stop_mys1 = clock(); // for calculating speed of execution
+
+  load_board("mystery2.dat", board);
+  //display_board(board);
+  int start_mys2 = clock(); // for calculating speed of execution
+  if (solve_board(board)) {
+    cout << "The 'mystery2' board has a solution:" << endl;
+    //display_board(board);
+  } else 
+    cout << "A solution cannot be found." << endl;
+  int stop_mys2 = clock(); // for calculating speed of execution
+
+  load_board("mystery3.dat", board);
+  //display_board(board);
+  int start_mys3 = clock(); // for calculating speed of execution
+  if (solve_board(board)) {
+    cout << "The 'mystery3' board has a solution:" << endl;
+    //display_board(board);
+  } else 
+    cout << "A solution cannot be found." << endl;
+  int stop_mys3 = clock(); // for calculating speed of execution
+
+
+  cout << "Execution time (easy): " << (stop_easy - start_easy) / double(CLOCKS_PER_SEC)*1000 << endl;
+  cout << "Execution time (medium): " << (stop_med - start_med) / double(CLOCKS_PER_SEC)*1000 << endl;
+  cout << "Execution time (mystery1): " << (stop_mys1 - start_mys1) / double(CLOCKS_PER_SEC)*1000 << endl;
+  cout << "Execution time (mystery2): " << (stop_mys2 - start_mys2) / double(CLOCKS_PER_SEC)*1000 << endl;
+  cout << "Execution time (mystery3): " << (stop_mys3 - start_mys3) / double(CLOCKS_PER_SEC)*1000 << endl;
+
+
+  /*
 
 	// write more tests
 
   cout << "====================== Question 5 ======================" << endl << endl;
 
 	// write more tests
-
-	*/
+  */
+   
   return 0;
 }

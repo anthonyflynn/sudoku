@@ -161,15 +161,12 @@ bool solve_board(char board[9][9])
       board[row][column] = '.';
       return false;
     }
-
-
-
-
   //REMEMBER TO DELETE ELEMENTS IN LINKED LIST WHEN FINISHED USING
-
 
   return true;
 }
+
+
 
 bool invalid_digit(char digit) // returns true if the digit is invalid (i.e. not between 1 and 9)
 {
