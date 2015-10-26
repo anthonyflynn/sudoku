@@ -1,27 +1,43 @@
 #include <iostream>
 #include <cstdio>
 #include <ctime> // for calculating calculation speed
+#include <cassert> // for testing
 #include "sudoku.h"
 
 using namespace std;
 
 int main() {
 
+  // FILE FOR DEMONSTRATING PROGRAM: 
+  /*
   char board[9][9];
+  char file[80]; // max filename of 79 charaters
+  
+  cout << "This is a program which finds the solution to Sudoku puzzles." << endl;
+  cout << "Please enter the filename of the Sudoku which you'd like to solve: ";
+  cin >> file;
+  
+  load_board(file, board);
+  cout << "\nThe original unsolved puzzle is: " << endl;
+  display_board(board);
 
-  /* This section illustrates the use of the pre-supplied helper functions. */
+  if (solve_board(board)) {
+    cout << "\nThe board '" << file << "' has a solution:" << endl;
+    display_board(board);
+  } else 
+    cout << "\nA solution cannot be found." << endl;
+
+  cout << "Please enter a filename where you would like to save the solution: ";
+  cin >> file;
+  if (save_board(file, board))
+    cout << "Save board to '" << file << "' successful." << endl;
+  else
+    cout << "Save board failed." << endl;
+  cout << endl;
+  */
+  
 
   /*
-  cout << "============== Pre-supplied functions ==================" << endl << endl;
-
-  cout << "Calling load_board():" << endl;
-  load_board("easy.dat", board);
-
-  cout << endl << "Displaying Sudoku board with display_board():" << endl;
-  display_board(board);
-  cout << "Done!" << endl << endl;
-
-  
   cout << "====================== Question 1 ======================" << endl << endl;
 
   load_board("easy.dat", board);
@@ -48,7 +64,6 @@ int main() {
   display_board(board);
 
 	// write more tests
-  
   cout << "====================== Question 3 ======================" << endl << endl;
 
   load_board("easy.dat", board);
@@ -59,80 +74,84 @@ int main() {
   else
     cout << "Save board failed." << endl;
   cout << endl;
-  
-  // write tests for this
 
-  
   cout << "====================== Question 4 ======================" << endl << endl;
 
-  */
-
   load_board("easy.dat", board);
-  //display_board(board);
   int start_easy = clock(); // for calculating speed of execution
   if (solve_board(board)) {
     cout << "The 'easy' board has a solution:" << endl;
-    //display_board(board);
+    display_board(board);
   } else 
     cout << "A solution cannot be found." << endl;
   int stop_easy = clock(); // for calculating speed of execution
+  
+  */
+  int start, stop;
+  char board[9][9];
+
+  load_board("easy.dat", board);
+  start = clock(); // for calculating speed of execution
+  if (solve_board(board)) {
+    stop = clock(); // for calculating speed of execution
+    cout << "Execution time (Easy): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
+    display_board(board);
+  } else 
+    cout << "Easy: A solution cannot be found." << endl;
+
 
   load_board("medium.dat", board);
-  //display_board(board);
-  int start_med = clock(); // for calculating speed of execution
+  start = clock(); // for calculating speed of execution
   if (solve_board(board)) {
-    cout << "The 'medium' board has a solution:" << endl;
-    //display_board(board);
+    stop = clock(); // for calculating speed of execution
+    cout << "Execution time (Medium): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
+    display_board(board);
   } else 
-    cout << "A solution cannot be found." << endl;
-  int stop_med = clock(); // for calculating speed of execution
+    cout << "Medium: A solution cannot be found." << endl;
 
   load_board("mystery1.dat", board);
-  //display_board(board);
-  int start_mys1 = clock(); // for calculating speed of execution
+  start = clock(); // for calculating speed of execution
   if (solve_board(board)) {
-    cout << "The 'mystery1' board has a solution:" << endl;
-    //display_board(board);
+    stop = clock(); // for calculating speed of execution
+    cout << "Execution time (Mystery1): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
+    display_board(board);
   } else 
-    cout << "A solution cannot be found." << endl;
-  int stop_mys1 = clock(); // for calculating speed of execution
+    cout << "Mystery1: A solution cannot be found." << endl;
 
   load_board("mystery2.dat", board);
-  //display_board(board);
-  int start_mys2 = clock(); // for calculating speed of execution
+  start = clock(); // for calculating speed of execution
   if (solve_board(board)) {
-    cout << "The 'mystery2' board has a solution:" << endl;
-    //display_board(board);
+    stop = clock(); // for calculating speed of execution
+    cout << "Execution time (Mystery2): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
+    display_board(board);
   } else 
-    cout << "A solution cannot be found." << endl;
-  int stop_mys2 = clock(); // for calculating speed of execution
+    cout << "Mystery2: A solution cannot be found." << endl;
 
   load_board("mystery3.dat", board);
-  //display_board(board);
-  int start_mys3 = clock(); // for calculating speed of execution
+  start = clock(); // for calculating speed of execution
   if (solve_board(board)) {
-    cout << "The 'mystery3' board has a solution:" << endl;
-    //display_board(board);
+    stop = clock(); // for calculating speed of execution
+    cout << "Execution time (Mystery3): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
+    display_board(board);
   } else 
-    cout << "A solution cannot be found." << endl;
-  int stop_mys3 = clock(); // for calculating speed of execution
+    cout << "Mystery3: A solution cannot be found." << endl;
 
 
-  cout << "Execution time (easy): " << (stop_easy - start_easy) / double(CLOCKS_PER_SEC)*1000 << endl;
-  cout << "Execution time (medium): " << (stop_med - start_med) / double(CLOCKS_PER_SEC)*1000 << endl;
-  cout << "Execution time (mystery1): " << (stop_mys1 - start_mys1) / double(CLOCKS_PER_SEC)*1000 << endl;
-  cout << "Execution time (mystery2): " << (stop_mys2 - start_mys2) / double(CLOCKS_PER_SEC)*1000 << endl;
-  cout << "Execution time (mystery3): " << (stop_mys3 - start_mys3) / double(CLOCKS_PER_SEC)*1000 << endl;
 
 
   /*
-
-	// write more tests
-
-  cout << "====================== Question 5 ======================" << endl << endl;
-
-	// write more tests
+  unit_test_is_complete();
+  unit_test_invalid_digit();
+  unit_test_out_of_range();
+  unit_test_duplicate_digit_in_row();
+  unit_test_duplicate_digit_in_column();
+  unit_test_duplicate_digit_in_box();
+  unit_test_make_move();
+  unit_test_save_board();
+  unit_test_get_next_empty_square();
   */
-   
+
   return 0;
 }
+
+
