@@ -95,17 +95,16 @@ int main() {
   if (solve_board(board)) {
     stop = clock(); // for calculating speed of execution
     cout << "Execution time (Easy): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
-    display_board(board);
+    //display_board(board);
   } else 
     cout << "Easy: A solution cannot be found." << endl;
-
 
   load_board("medium.dat", board);
   start = clock(); // for calculating speed of execution
   if (solve_board(board)) {
     stop = clock(); // for calculating speed of execution
     cout << "Execution time (Medium): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
-    display_board(board);
+    //display_board(board);
   } else 
     cout << "Medium: A solution cannot be found." << endl;
 
@@ -114,7 +113,7 @@ int main() {
   if (solve_board(board)) {
     stop = clock(); // for calculating speed of execution
     cout << "Execution time (Mystery1): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
-    display_board(board);
+    //display_board(board);
   } else 
     cout << "Mystery1: A solution cannot be found." << endl;
 
@@ -123,7 +122,6 @@ int main() {
   if (solve_board(board)) {
     stop = clock(); // for calculating speed of execution
     cout << "Execution time (Mystery2): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
-    display_board(board);
   } else 
     cout << "Mystery2: A solution cannot be found." << endl;
 
@@ -132,10 +130,10 @@ int main() {
   if (solve_board(board)) {
     stop = clock(); // for calculating speed of execution
     cout << "Execution time (Mystery3): " << (stop - start) / double(CLOCKS_PER_SEC)*1000 << endl;
-    display_board(board);
+    //display_board(board);
   } else 
     cout << "Mystery3: A solution cannot be found." << endl;
-
+  display_board(board);
 
 
 

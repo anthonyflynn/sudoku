@@ -13,7 +13,7 @@ bool is_complete(const char board[9][9]);
 bool make_move(const char *position, const char digit, char board[9][9]);
 bool save_board(const char *filename, const char board[9][9]);
 bool solve_board(char board[9][9]);
-bool helper_function(char board[9][9], Node_ptr possible_values[9][9], Node_ptr last_node_tested);
+bool fill_next_square(char board[9][9], Node_ptr possible_values[9][9], Node_ptr last_node_tested);
 
 
 
@@ -31,10 +31,8 @@ void get_next_empty_square(int &row, int &column, char board[9][9]);
 // Functions related to linked list / possible values array:
 Node_ptr assign_new_node(const char digit);
 void add_to_rear(Node_ptr &front, const char digit);
-void print_linked_list(const Node_ptr front);
-void print_possible_values(Node_ptr possible_values[9][9]);
 void make_null(Node_ptr array[9][9]);
-void calculate_possible_values(Node_ptr possible_values[9][9], char board[9][9]);
+void calculate_valid_digits(Node_ptr valid_digits[9][9], char board[9][9]);
 Node_ptr find_node(const Node_ptr front, const char digit);
 
 

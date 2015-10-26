@@ -113,73 +113,100 @@ bool save_board(const char *filename, const char board[9][9]) {
 }
 
 
+/*
 
 bool solve_board(char board[9][9])
 {
-  Node_ptr possible_values[9][9];
-  make_null(possible_values);  // sets all pointers to an initial value of NULL:
-  calculate_possible_values(possible_values, board); // calculates all possible values for each square based on numbers currently placed on board
-
-  //print_possible_values(possible_values); // consider changing the names here and in fuction declarations / definitions
-
-  //find_and_delete_node(possible_values[0][0],'1');
-
-  //remove_values_from_peers - this is supposed to remove a value from squares peers if that square has only one possible value 
-  
-  helper_function(board, possible_values, NULL);
-
-}
-
-
-bool helper_function(char board[9][9], Node_ptr possible_values[9][9], Node_ptr last_node_tested) // RENAME THIS FUNCTION - NOT REPRESENTATIVE
-{
   int row(0), column(0);
-  //print_possible_values(possible_values);
-  //display_board(board);
+
   if(is_complete(board))
     {
-      save_board("easy-solution-AF.dat", board);
+      save_board("sudoku-solution.dat", board);
       return true;
     }
 
   get_next_empty_square(row, column, board);
-  //if(row < 0 || column < 0 || row > 8 || column > 8)
-  //exit(1);
   
   char position[] = {row + 'A', column + '1'};
+  
+  char attempt = '1';
+  while(attempt <= '9')
+    {
+      if(make_move(position, attempt, board))
+	{
+	  if(solve_board(board))
+	     return true;
+	}
+      attempt++;
+    }
+
+  if(attempt > '9')
+    {
+      board[row][column] = '.';
+      return false;
+    }
+
+  return true;
+}
+*/
+
+
+
+
+/* function which attempts to solve the Sudoku puzzle in board.  Return value is true if a solution is found (and board contains final solution) or false if no solution exists (board unchanged)  */
+bool solve_board(char board[9][9])
+{
+  Node_ptr valid_digits[9][9]; // will contain potential values for each square (based on start board)
+  make_null(valid_digits);  // sets all pointers to an initial value of NULL:
+  calculate_valid_digits(valid_digits, board); // calculates all possible values for each square based on numbers placed on board at the start
+  fill_next_square(board, valid_digits, NULL);
+
+  //REMEMBER TO DELETE ELEMENTS IN LINKED LIST WHEN FINISHED USING
+}
+
+/* function which tests if board is complete (returns true), and if not finds the next empty square */
+bool fill_next_square(char board[9][9], Node_ptr valid_digits[9][9], Node_ptr last_node_tested)
+{
+  int row(0), column(0);
+  char position[2];
   Node_ptr current_ptr;
 
-  if(last_node_tested == NULL)
-    current_ptr = possible_values[row][column];
+  if(is_complete(board)) // tests if the board is complete - if so, solution found, return true
+    {
+      save_board("sudoku-solution.dat", board);
+      return true;
+    }
+
+  get_next_empty_square(row, column, board); // finds the row and column of the next empty square
+  position[0] = row + 'A';
+  position[1] = column + '1';
+
+  if(last_node_tested == NULL) // true if is the first value digit being tested in square
+    current_ptr = valid_digits[row][column]; // sets pointer to the node containing the first valid digit for the square
   else
-    current_ptr = last_node_tested -> ptr_to_next_node; // Declare current_ptr above
-  //char attempt = '1';
+    current_ptr = last_node_tested -> ptr_to_next_node; // moves the pointer onto the next valid digit
 
   while(current_ptr != NULL)
     {
       char attempt = current_ptr -> value;
-      if(make_move(position, attempt, board))
+      if(make_move(position, attempt, board)) //tests if the digit can be validly placed in the square
 	{
-	  if(helper_function(board, possible_values, NULL)) // RENAME
+	  if(fill_next_square(board, valid_digits, NULL)) // if valid, move onto the next square
 	     return true;
 	}
       current_ptr = current_ptr -> ptr_to_next_node;
     }
 
-  if(current_ptr == NULL)
+  if(current_ptr == NULL) // if no valid digits can be placed in the board, square set to blank
     {
       board[row][column] = '.';
-      return false;
+      return false; // moves back to previous cell filled
     }
-  //REMEMBER TO DELETE ELEMENTS IN LINKED LIST WHEN FINISHED USING
-
 }
 
 
-
-
-
-bool invalid_digit(const char digit) // returns true if the digit is invalid (i.e. not a char between 1 and 9)
+/* function returns true if the digit is invalid (i.e. not a char between 1 and 9) */
+bool invalid_digit(const char digit)
 {
   if (static_cast<int>(digit) > 57 || static_cast<int>(digit) < 49) // '1' = 49 (ASCII), '9' = 57 (ASCII)
     return true;
@@ -187,7 +214,8 @@ bool invalid_digit(const char digit) // returns true if the digit is invalid (i.
     return false;
 }
 
-bool out_of_range(const int row, const int column) // returns true if test coordinate is out of range
+/* function returns true if test coordinate is out of range */
+bool out_of_range(const int row, const int column)
 {
   if ((row > 8 || row < 0) || (column > 8 || column < 0))
     return true;
@@ -195,7 +223,8 @@ bool out_of_range(const int row, const int column) // returns true if test coord
     return false;
 }
 
-bool duplicate_digit_in_row(const int row, const char digit, char board[9][9]) // returns true if digit already appears in the same row
+/* function returns true if digit already appears in the same row */
+bool duplicate_digit_in_row(const int row, const char digit, char board[9][9])
 {
   for (int c = 0; c < 9; c++)
     {
@@ -205,7 +234,8 @@ bool duplicate_digit_in_row(const int row, const char digit, char board[9][9]) /
   return false;
 }
 
-bool duplicate_digit_in_column(const int column, const char digit, char board[9][9]) // returns true if digit already appears in the same column
+/* function returns true if digit already appears in the same column */
+bool duplicate_digit_in_column(const int column, const char digit, char board[9][9])
 {
   for (int r = 0; r < 9; r++)
     {
@@ -215,7 +245,8 @@ bool duplicate_digit_in_column(const int column, const char digit, char board[9]
   return false;
 }
 
-bool duplicate_digit_in_box(const int row, const int column, const char digit, char board[9][9]) // returns true if digit already appears in the same 3x3 box
+/* function returns true if digit already appears in the same 3x3 box */
+bool duplicate_digit_in_box(const int row, const int column, const char digit, char board[9][9])
 {
   int test_row = (row / 3) * 3; // converts row to a value of either 0, 3 or 6 to test box
   int test_column = (column / 3) * 3; // converts column to a value of either 0, 3 or 6 to test box
@@ -231,7 +262,8 @@ bool duplicate_digit_in_box(const int row, const int column, const char digit, c
   return false;
 }
 
-bool check_valid(const int row, const int column, const char digit, char board[9][9])// returns true if digit can be validly placed in the square indicated by row and column in board.  Otherwise returns false.
+/* function returns true if digit can be validly placed in the square indicated by row and column in board.  Otherwise returns false. */
+bool check_valid(const int row, const int column, const char digit, char board[9][9])
 {
   if (invalid_digit(digit))
     return false;
@@ -251,7 +283,7 @@ bool check_valid(const int row, const int column, const char digit, char board[9
   return true;
 }
 
-/* function which returns the row and column coordinates of the next square of board which does not contain a digit */
+/* function returns the row and column coordinates of the next square of board which does not contain a digit */
 void get_next_empty_square(int &row, int &column, char board[9][9])
 {
   if(!isdigit(board[0][0])) // case where top left square is empty
@@ -270,11 +302,11 @@ void get_next_empty_square(int &row, int &column, char board[9][9])
     }
 }
 
-
+/* function creates a new node and assigns its value as input parameter digit and the pointer to next node as NULL */
 Node_ptr assign_new_node(const char digit)
 {
   Node_ptr new_node = new (nothrow) Node;
-  if(new_node == NULL)
+  if(new_node == NULL) // checks if there is enough memory to generate a new node
     {
       cout << "Error - no more memory left to assign Nodes";
       exit(1);
@@ -283,12 +315,13 @@ Node_ptr assign_new_node(const char digit)
   new_node -> ptr_to_next_node = NULL;
 }
 
+/* function attaches a new node to the rear of a linked list with its value set as input parameter digit. */
 void add_to_rear(Node_ptr &front, const char digit)
 {
-  Node_ptr new_last_node = assign_new_node(digit);
+  Node_ptr new_last_node = assign_new_node(digit); // generates new node and assigns its value as digit
   Node_ptr previous_last_node = front;
   
-  if (!front) // i.e. if there are no Nodes currently in the list
+  if (!front) // i.e. if there are no nodes currently in the list
     {
       front = new_last_node;
       return;
@@ -298,30 +331,10 @@ void add_to_rear(Node_ptr &front, const char digit)
   while((previous_last_node -> ptr_to_next_node) != NULL)
     previous_last_node = previous_last_node -> ptr_to_next_node;
 
-  previous_last_node -> ptr_to_next_node = new_last_node;
+  previous_last_node -> ptr_to_next_node = new_last_node; // adds the new node to the rear of the list
 }
 
-void print_linked_list(const Node_ptr front)
-{
-  for (Node_ptr current = front; current; current = current -> ptr_to_next_node)
-    {
-      cout << current -> value;
-    }
-}
-
-void print_possible_values(Node_ptr possible_values[9][9]) // CAN DELETE WHEN FINISHED TESTING
-{
-  for(int r=0; r<9; r++)
-    {
-      for(int c=0; c<9; c++)
-	{
-	  print_linked_list(possible_values[r][c]);
-	  cout << " ";
-	}
-      cout << endl;
-    }  
-}
-
+/* function sets the array of node pointers to null*/
 void make_null(Node_ptr array[9][9])
 {
   for(int r=0; r<9; r++)
@@ -329,22 +342,23 @@ void make_null(Node_ptr array[9][9])
       array[r][c] = NULL;
 }
 
-void calculate_possible_values(Node_ptr possible_values[9][9], char board[9][9])
+/* for each square, create a linked list of valid digits based on start board */
+void calculate_valid_digits(Node_ptr valid_digits[9][9], char board[9][9])
 {
   for(int r=0; r<9; r++)
     {
       for(int c=0; c<9; c++)
 	{
-	  if(isdigit(board[r][c]))
-	    add_to_rear(possible_values[r][c], board[r][c]);
+	  if(isdigit(board[r][c])) // if board already contains a value at start
+	    add_to_rear(valid_digits[r][c], board[r][c]);
 	  else
 	    {
 	      char test_value = '1';
-	      while(test_value <= '9')
+	      while(test_value <= '9') // iterate through possible digits and add valid ones to the array of valid digits
 		{
 		  if(check_valid(r, c, test_value, board))
 		    {
-		      add_to_rear(possible_values[r][c], test_value);
+		      add_to_rear(valid_digits[r][c], test_value);
 		    }
 		  test_value++;
 		}
@@ -353,7 +367,8 @@ void calculate_possible_values(Node_ptr possible_values[9][9], char board[9][9])
     }
 }
 
-Node_ptr find_node(const Node_ptr front, const char digit) // finds a Node with a particular value...think about what to do if the searched value is not found.
+/* function finds a node with a particular value. */
+Node_ptr find_node(const Node_ptr front, const char digit) 
 {
   Node_ptr node_being_sought = front;
   
@@ -366,28 +381,7 @@ Node_ptr find_node(const Node_ptr front, const char digit) // finds a Node with 
       node_being_sought = node_being_sought -> ptr_to_next_node;
     }
 
-  //THIS IS NOT VERY GOOD - IMPROVE:
-  cout << "Error - value not found";
-  exit(1);
 }
-
-
-
-
-
-/*
-void remove_values_from_peers(Node_ptr possible_values[9][9])
-{
-  char test;
-  int row(0), column(0);
-
-  while(possible_values[r][c] != NULL)
-    {
-      test = possible_values -> value;
-
-}
-*/
-
 
 
 //UNIT TEST FUNCTIONS:
@@ -744,18 +738,6 @@ void unit_test_get_next_empty_square()
 
   cout << "Unit test completed successfully - get_next_empty_square(...)" << endl;
 }
-
-
-
-
-/*
-void unit_test_()
-{
-  cout << "Unit test completed successfully - (...)" << endl;
-}
-
-*/
-
 
 
 /*
