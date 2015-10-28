@@ -99,16 +99,19 @@ bool make_move(const char *position, const char digit, char board[9][9])
 /* function which outputs the 2D character array board to a file with name 'filename'.  Return true if file written successfully, otherwise false */
 bool save_board(const char *filename, const char board[9][9]) {
   ofstream out(filename);
+  int row = 0;
+
   if (!out)
     return false;  // No assert as no need to exit the program if the file save not successful
 
-  int row = 0;
   while (out && row < 9) {
     for (int n=0; n<9; n++)
       out.put(board[row][n]); // No assert as no need to exit the program if the file save not successful
     out.put('\n');
     row++;
   }
+
+  out.close();
   return ((row == 9) ? true : false);
 }
 
@@ -116,13 +119,14 @@ bool save_board(const char *filename, const char board[9][9]) {
 bool solve_board(char board[9][9])
 {
   Node_ptr valid_digits[9][9]; // will contain potential values for each square (based on start board)
-  bool solution_found(false);
+  bool solution_found(false); // returns true if there is a potential solution, otherwise false
   make_null(valid_digits);  // sets all pointers to an initial value of NULL:
   calculate_valid_digits(valid_digits, board); // calculates all possible values for each square based on numbers placed on board at the start
   solution_found = fill_next_square(board, valid_digits, NULL);
-  delete_linked_list_array(valid_digits); // delete linked list
+  delete_linked_list_array(valid_digits); // delete linked list to free up memory
   return solution_found;
 }
+
 
 /* function which tests if board is complete (returns true), and if not finds the next empty square */
 bool fill_next_square(char board[9][9], Node_ptr valid_digits[9][9], Node_ptr last_node_tested)
@@ -133,11 +137,11 @@ bool fill_next_square(char board[9][9], Node_ptr valid_digits[9][9], Node_ptr la
 
   if(is_complete(board)) // tests if the board is complete - if so, solution found, return true
     {
-      save_board("sudoku-solution.dat", board);
       return true;
     }
 
   get_next_empty_square(row, column, board); // finds the row and column of the next empty square
+
   position[0] = row + 'A';
   position[1] = column + '1';
 
@@ -250,6 +254,7 @@ void get_next_empty_square(int &row, int &column, char board[9][9])
       row = column = 0;
       return;
     }
+
   while(isdigit(board[row][column]) && row < 9)
     {
       row++; // if square contains a digit, and row < 9, increment row
@@ -265,11 +270,13 @@ void get_next_empty_square(int &row, int &column, char board[9][9])
 Node_ptr assign_new_node(const char digit)
 {
   Node_ptr new_node = new (nothrow) Node;
+
   if(new_node == NULL) // checks if there is enough memory to generate a new node
     {
       cout << "Error - no more memory left to assign Nodes";
       exit(1);
     }
+
   new_node -> value = digit;
   new_node -> ptr_to_next_node = NULL;
 }

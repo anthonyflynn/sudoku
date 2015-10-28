@@ -1,1 +1,90 @@
-Summarise your findings here (see specification).
+Terminology:
+- Square = one cell, of which there are 81 in the Sudoku puzzle
+- Box = a group of 9x9 squares
+
+
+Conclusions
+In order to assess which of the mystery puzzle boards correspond to
+"hard", "extremely hard" and "impossible", my program was used to solve
+all of the puzzles a number of times.  To eliminate variances in
+performance from test to test (related to use of the computer for
+other tasks) the test was carried out 100 times (used to calculate
+average time), and this was repeated five times and again averaged.  
+
+A summary of the outcomes is as follows:
+
+Calculation speed (ms) - each test = average time for 100 cycles:
+	    easy  medium mystery1      mystery2	  mystery3
+Test 1:	    0.87  4.94	 270.38	       None	  77.32
+Test 2:	    0.82  4.64	 273.31	       None	  74.34
+Test 3:	    0.91  4.75	 270.46	       None	  73.80
+Test 4:	    0.88  4.78	 270.39	       None	  74.06
+Test 5:	    0.79  4.94	 270.46	       None	  74.22
+
+Average:    0.85  4.81	 271.00	       None	  74.75
+
+
+This data suggests the following conclusions:
+Hard: mystery3
+Extremely hard: mystery1
+Impossible: mystery2
+
+
+Summary of program:
+My program considers all of the potential digits that can be placed in
+each square before starting the recursive function to find a
+solution.  These acceptable digits are placed into an array of
+linked lists, and only these values are used in the recursion process
+(rather than starting at '1' and continuing to '9' as is used in a
+pure brute-force solution).
+
+Through making this alteration, the calculation time is dramatically
+reduced vs. a brute force algorithm.  As a comparision, equivalents
+tests run for a brute force algorithm produced the results below,
+suggesting an efficiency improvement of 27 - 38% for my solution.
+
+Calculation speed (ms) - each test = average time for 100 cycles:
+	    easy  medium mystery1      mystery2	  mystery3
+Test 1:	    1.31  7.32	 438.17	       None	  119.68
+Test 2:	    1.16  7.00	 438.34	       None	  119.76
+Test 3:	    1.01  7.03	 438.04	       None	  119.32
+Test 4:	    1.18  6.88	 438.38	       None	  119.74
+Test 5:	    1.15  7.07	 438.42	       None	  119.82
+
+Average:    1.16  7.06	 438.27	       None	  119.66
+
+
+Relative efficiency of my algorith vs. brute force:
+	    27%	  32%     38%	       N/A        38%
+
+
+The recursion process starts with a call to fill_next_square(...).
+This function first tests if the board is complete, and if not, finds
+the next empty cell.  On the first attempt to the fill the square, the
+first digit in the linked list valid_digits[row][column] is tested for
+validity, and if it returns true, the digit is assigned and the
+function fill_next_square(...) is called again to find and fill the
+next empty cell.  Conversely, if the digit is not valid, the next digit in the
+linked list is tested for validity and this continues until either a
+valid digit is found or the end of the linked list is reached.  If
+there is no valid digit possible, then there must be a mistake in one
+of the previously assigned digits, so the square is set to empty ('.')
+and the recursion moves back to the previously filled square and moves
+onto the next digit in the linked list.  If the top left square
+reaches the end of its linked list without finding a solution, then there is no valid solution
+for the Sudoku and the function returns false.  If a valid solution is
+found for the Sudoku, then all branches of the recursion return true
+and the value of solution_found in solve_board(...) is set to true and
+returned as the value of this function.
+
+
+Potential further improvements:
+The program could be further improved by using the valid_digits array
+to assign values to squares in cases where there are no alternatives
+(before starting the brute force part of the program).  For example,
+for the easy Sudoku, the valid_digits array contains the following
+values for cell H7: 4, 6, 7, 8.  However, by looking at the
+neighbouring squares in the bottom right box, it is clear the
+digit '7' is only valid in square H7, and it could therefore be
+assigned.  This would avoid having to cycle through the values 4 and 6
+in the brute force algorithm (which wastes time and resources).

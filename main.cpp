@@ -8,9 +8,7 @@ using namespace std;
 
 int main() {
 
-  // FILE FOR DEMONSTRATING PROGRAM:
-  
-  /*
+  // PROGRAM FOR DEMONSTRATING FUNCTION:
   char board[9][9];
   char file[80]; // max filename of 79 charaters
   
@@ -35,22 +33,10 @@ int main() {
   else
     cout << "Save board failed." << endl;
   cout << endl;
-  */
   
 
   /*
-  //TESTS FROM ORIGINAL MAIN FILE:
-  char board[9][9];
-
-  load_board("easy.dat", board);
-  assert(!is_complete(board));
-  assert(make_move("I8", '1', board));
-  assert(save_board("easy-copy.dat", board));
-
-  load_board("easy-solution.dat", board);
-  assert (is_complete(board));
-  */
-
+  // PROGRAM FOR TESTING:
   int start, stop, count(1);
   double total_time(0);
   char board[9][9];
@@ -68,7 +54,7 @@ int main() {
   cout << "Average execution time (Easy): " << total_time / (count - 1) << endl;
   display_board(board);
 
-  
+  */
 
   return 0;
 }
