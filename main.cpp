@@ -7,7 +7,7 @@
 using namespace std;
 
 int main() {
-
+  /*
   // PROGRAM FOR DEMONSTRATING FUNCTION:
   char board[9][9];
   char file[80]; // max filename of 79 charaters
@@ -36,27 +36,27 @@ int main() {
   else
     cout << "Save board failed." << endl;
   cout << endl;
-
-  /*
+  */
+  
   // PROGRAM FOR TESTING:
-  int start, stop, count(1);
+  int start, stop, count(1), recursive_calls(0);
   double total_time(0);
   char board[9][9];
 
-  while(count <= 100)
+  while(count <= 1)
     {
-      load_board("mystery3.dat", board);
+      load_board("easy.dat", board);
+      display_board(board);
       start = clock(); // for calculating speed of execution
       solve_board(board);
       stop = clock(); // for calculating speed of execution
       total_time += ((stop - start) / double(CLOCKS_PER_SEC)*1000);
       count++;
     }
-  cout << count << endl;
-  cout << "Average execution time (Easy): " << total_time / (count - 1) << endl;
+  cout << "Average number of recursive calls: " << (get_global_count() - 1) / (count - 1) << endl;
+  cout << "Average execution time: " << total_time / (count - 1) << endl;
   display_board(board);
 
-  */
 
   return 0;
 }

@@ -117,26 +117,39 @@ bool save_board(const char *filename, const char board[9][9]) {
   return ((row == 9) ? true : false);
 }
 
+
 /* function which attempts to solve the Sudoku puzzle in board.  Return value is true if a solution is found (and board contains final solution) or false if no solution exists (board unchanged)  */
 bool solve_board(char board[9][9])
 {
-  Node_ptr valid_digits[9][9]; // will contain potential values for each square (based on start board)
   bool solution_found(false); // returns true if there is a potential solution, otherwise false
-  make_null(valid_digits);  // sets all pointers to an initial value of NULL:
-  calculate_valid_digits(valid_digits, board); // calculates all possible values for each square based on numbers placed on board at the start
-  solution_found = fill_next_square(board, valid_digits, NULL);
-  delete_linked_list_array(valid_digits); // delete linked list to free up memory
+  int board_sum_before = sum_board(board);
+  int board_sum_after(0), difference(0);
+
+  save_board("temp.dat", board); // Needed in case no solution found (so board to returned to unchanged state)
+
+  do
+    {
+      deduce_digits(board);
+      board_sum_after = sum_board(board);
+      difference = board_sum_after - board_sum_before;
+      board_sum_before = board_sum_after;
+    } while(!is_complete(board) && difference != 0); // keep trying to make deductions until either the board is complete or there are no further deductions possible
+
+  solution_found = fill_next_square(board); // call fill_next_square(..) which will either return true (if board is complete) or false (if no solution found)
+
+  if(!solution_found) // Return board to initial state if no solution found
+    load_board("temp.dat", board);
+
   return solution_found;
 }
 
-
-/* function which tests if board is complete (returns true), and if not finds the next empty square */
-bool fill_next_square(char board[9][9], Node_ptr valid_digits[9][9], Node_ptr last_node_tested)
+/* function which tests if board is complete (returns true), and if not, attempts to fill the next empty square */
+bool fill_next_square(char board[9][9])
 {
-  global_count++;
+  global_count++; // counter for number of times recursive function called
   int row(0), column(0);
   char position[2];
-  Node_ptr current_ptr;
+  char attempt = '1'; // start search with digit '1'
 
   if(is_complete(board)) // tests if the board is complete - if so, solution found, return true
     {
@@ -146,25 +159,19 @@ bool fill_next_square(char board[9][9], Node_ptr valid_digits[9][9], Node_ptr la
   get_next_empty_square(row, column, board); // finds the row and column of the next empty square
 
   position[0] = row + 'A';
-  position[1] = column + '1';
+  position[1] = column + '1'; // Begin search in the top left square
 
-  if(last_node_tested == NULL) // true if is the first value digit being tested in square
-    current_ptr = valid_digits[row][column]; // sets pointer to the node containing the first valid digit for the square
-  else
-    current_ptr = last_node_tested -> ptr_to_next_node; // moves the pointer onto the next valid digit
-
-  while(current_ptr != NULL)
+  while(attempt <= '9')
     {
-      char attempt = current_ptr -> value;
       if(make_move(position, attempt, board)) //tests if the digit can be validly placed in the square
 	{
-	  if(fill_next_square(board, valid_digits, NULL)) // if valid, move onto the next square
+	  if(fill_next_square(board)) // if valid, move onto the next square
 	     return true;
 	}
-      current_ptr = current_ptr -> ptr_to_next_node;
+      attempt++;
     }
 
-  if(current_ptr == NULL) // if no valid digits can be placed in the board, square set to blank
+  if(attempt > '9') // if no valid digits can be placed in the board, square set to blank
     {
       board[row][column] = '.';
       return false; // moves back to previous cell filled
@@ -269,132 +276,215 @@ void get_next_empty_square(int &row, int &column, char board[9][9])
     }
 }
 
-/* function to return the total number of recursive calls to reach a solution */
-int get_global_count()
-{
-  return global_count;
-}
-
-/* function creates a new node and assigns its value as input parameter digit and the pointer to next node as NULL */
-Node_ptr assign_new_node(const char digit)
-{
-  Node_ptr new_node = new (nothrow) Node;
-
-  if(new_node == NULL) // checks if there is enough memory to generate a new node
-    {
-      cout << "Error - no more memory left to assign Nodes";
-      exit(1);
-    }
-
-  new_node -> value = digit;
-  new_node -> ptr_to_next_node = NULL;
-}
-
-/* function attaches a new node to the rear of a linked list with its value set as input parameter digit. */
-void add_to_rear(Node_ptr &front, const char digit)
-{
-  Node_ptr new_last_node = assign_new_node(digit); // generates new node and assigns its value as digit
-  Node_ptr previous_last_node = front;
-  
-  if (!front) // i.e. if there are no nodes currently in the list
-    {
-      front = new_last_node;
-      return;
-    }
-
-  // default case for existing list:
-  while((previous_last_node -> ptr_to_next_node) != NULL)
-    previous_last_node = previous_last_node -> ptr_to_next_node;
-
-  previous_last_node -> ptr_to_next_node = new_last_node; // adds the new node to the rear of the list
-}
-
-/* function sets the array of node pointers to null*/
-void make_null(Node_ptr array[9][9])
-{
-  for(int r=0; r<9; r++)
-    for(int c=0; c<9; c++)
-      array[r][c] = NULL;
-}
-
-/* for each square, create a linked list of valid digits based on start board */
-void calculate_valid_digits(Node_ptr valid_digits[9][9], char board[9][9])
+/* function initialises a 3D boolean array to false throughout */
+void fill_with_false(bool valid_digits[9][9][9])
 {
   for(int r=0; r<9; r++)
     {
       for(int c=0; c<9; c++)
 	{
-	  if(isdigit(board[r][c])) // if board already contains a value at start
-	    add_to_rear(valid_digits[r][c], board[r][c]);
+	  for(int d=0; d<9; d++) // for all digits
+	    valid_digits[r][c][d] = false;
+	}
+    }
+}
+
+/* function sets values in the 3D array valid_digits to true based based on whether the digit could be validly placed (based on existing state of board). */
+void calculate_valid_digits(bool valid_digits[9][9][9], char board[9][9])
+{
+  int digit_position; // represents the position in the array of digit (in the third dimension). E.g digit '1' occupies space 0, up to digit '9' in space 8
+  char test_value;
+  for(int r=0; r<9; r++) // for each row
+    {
+      for(int c=0; c<9; c++) // for each column
+	{
+	  if(isdigit(board[r][c])) // if board already contains a value
+	    {
+	      digit_position = board[r][c] - '1';
+	      valid_digits[r][c][digit_position] = true; // set corresponding position in third dimension to true (represents that digit)
+	    }
 	  else
 	    {
-	      char test_value = '1';
-	      while(test_value <= '9') // iterate through possible digits and add valid ones to the array of valid digits
+	      test_value = '1';
+	      while(test_value <= '9') // otherwise, iterate through possible digits and set valid ones to true in the third dimension of the 3D array for that row & column
 		{
 		  if(check_valid(r, c, test_value, board))
 		    {
-		      add_to_rear(valid_digits[r][c], test_value);
+		      digit_position = test_value - '1';
+		      valid_digits[r][c][digit_position] = true; // set appropriate digit position to true
 		    }
-		  test_value++;
+		  test_value++; // test next digit, until '9' reached
 		}
 	    }
 	}
     }
 }
 
-/* function finds a node with a particular value. */
-Node_ptr find_node(const Node_ptr front, const char digit) 
+/* function tests whether digits can be added to the board through deduction */
+void deduce_digits(char board[9][9])
 {
-  Node_ptr node_being_sought = front;
-  
-  while(node_being_sought != NULL)
-    {
-      if(digit == (node_being_sought -> value))
-	{
-	  return node_being_sought;
-	}
-      node_being_sought = node_being_sought -> ptr_to_next_node;
-    }
+  deduce_in_row(board);
+  deduce_in_column(board);
+  deduce_in_box(board);
+  deduce_from_valid_digits(board);
 }
 
-/* function to delete a linked list */
-void delete_linked_list_array(Node_ptr valid_digits[9][9])
+/* function updates the board for any values which can be deduced on a row by row basis. Each digit is considered in turn and, for each row, if there is only one square which can be validly hold that digit, the board is updated to reflect this */
+void deduce_in_row(char board[9][9])
 {
-  Node_ptr next_node;
-  for(int r=0; r<9; r++)
+  char digit;
+  int position(0), count(0);
+  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+
+  fill_with_false(valid_digits);
+  calculate_valid_digits(valid_digits, board);
+
+  for(int d=0; d<9; d++)
     {
-      for(int c=0; c<9; c++)
+      for(int r=0; r<9; r++)
 	{
-	  while(valid_digits[r][c] != NULL)
+	  digit = d + '1'; // convert d to an equivalent char (i.e. d = 0 implies char '1')
+	  if(!duplicate_digit_in_row(r, digit, board)) // tests if row already contains that digit
 	    {
-	      next_node = valid_digits[r][c] -> ptr_to_next_node;
-	      delete valid_digits[r][c];
-	      valid_digits[r][c] = next_node;
+	      for(int c=0; c<9; c++)
+		{
+		  count += valid_digits[r][c][d]; // count number of squares in row which can validly hold digit
+		  if(valid_digits[r][c][d])
+		    position = c; // remember the column of the last square which can validly hold digit
+		} 
+	      if(count == 1) // if only one valid position in the row for the digit
+		board[r][position] = digit;
+	      position = 0;
+	      count = 0;	      
 	    }
 	}
     }
 }
 
-/* function to print a linked list */
-void print_linked_list(const Node_ptr front)
+/* function updates the board for any values which can be deduced on a column by column basis. Each digit is considered in turn and, for each column, if there is only one square which can be validly hold that digit, the board is updated to reflect this */
+void deduce_in_column(char board[9][9])
 {
-  for (Node_ptr current = front; current; current = current -> ptr_to_next_node)
+  char digit;
+  int position(0), count(0);
+  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+
+  fill_with_false(valid_digits);
+  calculate_valid_digits(valid_digits, board);
+
+  for(int d=0; d<9; d++)
     {
-      cout << current -> value;
+      for(int c=0; c<9; c++)
+	{
+	  digit = d + '1'; // convert d to an equivalent char (i.e. d = 0 implies char '1')
+	  if(!duplicate_digit_in_column(c, digit, board)) // tests if column already contains that digit
+	    {
+	      for(int r=0; r<9; r++)
+		{
+		  count += valid_digits[r][c][d]; // count number of squares in column which can validly hold digit
+		  if(valid_digits[r][c][d])
+		    position = r; // remember the row of the last square which can validly hold digit
+		} 
+	      if(count == 1) // if only one valid position in the column for the digit
+		board[position][c] = digit;
+	      position = 0;
+	      count = 0;	      
+	    }
+	}
     }
+
 }
 
-/* function to print the list of valid digits */
-void print_valid_digits(Node_ptr valid_digits[9][9])
+
+/* function updates the board for any values which can be deduced on a box by box basis. Each digit is considered in turn and, for each box, if there is only one square which can be validly hold that digit, the board is updated to reflect this */
+void deduce_in_box(char board[9][9])
 {
+  char digit;
+  int row_position(0), column_position(0), count(0);
+  int test_row(0), test_column(0);
+  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+
+  fill_with_false(valid_digits); 
+  calculate_valid_digits(valid_digits, board);
+
+  for(int test_row = 0; test_row < 9; test_row = test_row + 3) // top left row of each box
+    {
+      for(int test_column = 0; test_column < 9; test_column = test_column + 3) // top left column of each box
+	{
+	  for(int d=0; d<9; d++)
+	    {
+	      digit = d + '1'; // convert d to an equivalent char (i.e. d = 0 implies char '1')
+	      if(!duplicate_digit_in_box(test_row, test_column, digit, board)) // tests if box already contains that digit
+		{
+		  for(int r = test_row; r < test_row + 3; r++)
+		    {
+		      for(int c = test_column; c < (test_column + 3); c++)
+			{
+			  count += valid_digits[r][c][d]; // count number of squares in box which can validly hold digit
+			  if(valid_digits[r][c][d])
+			    {
+			      row_position = r;
+			      column_position = c; // remember row and column of last square which can validly hold digit
+			    }
+			}
+		    }
+		  if(count == 1) // if only one valid position in the box for the digit
+		    board[row_position][column_position] = digit;
+		  row_position = column_position = 0;
+		  count = 0;	      
+		}
+	    }
+	}
+    }
+}		
+
+/* function updates the board for any values which can be deduced on a square by square basis. For each square in turn, the potentially valid digits are calculated.  If there is only one valid digit for that square, the board is updated to reflect this */
+void deduce_from_valid_digits(char board[9][9])
+{
+  char digit;
+  int position(0), count(0);
+  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+
+  fill_with_false(valid_digits); 
+  calculate_valid_digits(valid_digits, board); 
+
   for(int r=0; r<9; r++)
     {
       for(int c=0; c<9; c++)
 	{
-	  print_linked_list(valid_digits[r][c]);
-	  cout << " ";
+	  if(!isdigit(board[r][c])) // tests if square already contains a digit
+	    {
+	      for(int d=0; d<9; d++)
+		{
+		  count += valid_digits[r][c][d]; // count number of digits which can validly inserted into square
+		  if(valid_digits[r][c][d])
+		    position = d; // remember the last valid digit
+		}
+	      if(count == 1) // if only one valid digit
+		board[r][c] = position + '1';
+	      position = 0;
+	      count = 0;
+	    }
 	}
-      cout << endl;
-    }  
+    }
 }
+
+/* function sums to total value of characters in the board and returns this value */
+int sum_board(const char board[9][9])
+{
+  int sum(0);
+  for(int r=0; r<9; r++)
+    {
+      for(int c=0; c<9; c++)
+	sum += board[r][c];
+    }
+
+  return sum;
+}
+
+/* function returns the total number of recursive calls to reach a solution */
+int get_global_count()
+{
+  return global_count;
+}
+
 
