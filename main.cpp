@@ -11,7 +11,7 @@ int main() {
   // PROGRAM FOR DEMONSTRATING FUNCTION:
   char board[9][9];
   char file[80]; // max filename of 79 charaters
-  
+    
   cout << "This is a program which finds the solution to Sudoku puzzles." << endl;
   cout << "Please enter the filename of the Sudoku which you'd like to solve: ";
   cin >> file;
@@ -26,6 +26,9 @@ int main() {
   } else 
     cout << "\nA solution cannot be found." << endl;
 
+  cout << "Total number of recursive calls to solve puzzle: " << get_global_count();
+  cout << endl;
+
   cout << "Please enter a filename where you would like to save the solution: ";
   cin >> file;
   if (save_board(file, board))
@@ -33,7 +36,6 @@ int main() {
   else
     cout << "Save board failed." << endl;
   cout << endl;
-  
 
   /*
   // PROGRAM FOR TESTING:

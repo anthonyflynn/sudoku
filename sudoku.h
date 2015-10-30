@@ -23,6 +23,7 @@ bool duplicate_digit_in_column(const int column, const char digit, char board[9]
 bool duplicate_digit_in_box(const int row, const int column, const char digit, char board[9][9]);
 bool check_valid(const int row, const int column, const char digit, char board[9][9]);
 void get_next_empty_square(int &row, int &column, char board[9][9]);
+int get_global_count();
 
 // Functions related to linked list:
 Node_ptr assign_new_node(const char digit);

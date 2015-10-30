@@ -8,6 +8,8 @@
 
 using namespace std;
 
+int global_count(0); // counts the number of times the recursive function is called to reach a solution
+
 /* You are pre-supplied with the functions below. Add your own 
    function definitions to the end of this file. */
 
@@ -131,6 +133,7 @@ bool solve_board(char board[9][9])
 /* function which tests if board is complete (returns true), and if not finds the next empty square */
 bool fill_next_square(char board[9][9], Node_ptr valid_digits[9][9], Node_ptr last_node_tested)
 {
+  global_count++;
   int row(0), column(0);
   char position[2];
   Node_ptr current_ptr;
@@ -266,6 +269,12 @@ void get_next_empty_square(int &row, int &column, char board[9][9])
     }
 }
 
+/* function to return the total number of recursive calls to reach a solution */
+int get_global_count()
+{
+  return global_count;
+}
+
 /* function creates a new node and assigns its value as input parameter digit and the pointer to next node as NULL */
 Node_ptr assign_new_node(const char digit)
 {
@@ -388,3 +397,4 @@ void print_valid_digits(Node_ptr valid_digits[9][9])
       cout << endl;
     }  
 }
+
