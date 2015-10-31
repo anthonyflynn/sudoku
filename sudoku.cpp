@@ -126,7 +126,7 @@ bool solve_board(char board[9][9])
   int board_sum_after(0), difference(0);
 
   save_board("temp.dat", board); // Needed in case no solution found (so board to returned to unchanged state)
-
+  
   do
     {
       deduce_digits(board);
@@ -134,7 +134,7 @@ bool solve_board(char board[9][9])
       difference = board_sum_after - board_sum_before;
       board_sum_before = board_sum_after;
     } while(!is_complete(board) && difference != 0); // keep trying to make deductions until either the board is complete or there are no further deductions possible
-
+  
   solution_found = fill_next_square(board); // call fill_next_square(..) which will either return true (if board is complete) or false (if no solution found)
 
   if(!solution_found) // Return board to initial state if no solution found

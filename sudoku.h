@@ -17,6 +17,7 @@ void get_next_empty_square(int &row, int &column, char board[9][9]);
 void fill_with_false(bool valid_digits[9][9][9]);
 void calculate_valid_digits(bool valid_digits[9][9][9], char board[9][9]);
 void deduce_digits(char board[9][9]);
+
 void deduce_in_row(char board[9][9]);
 void deduce_in_column(char board[9][9]);
 void deduce_in_box(char board[9][9]);

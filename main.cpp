@@ -43,10 +43,9 @@ int main() {
   double total_time(0);
   char board[9][9];
 
-  while(count <= 1)
+  while(count <= 100)
     {
-      load_board("easy.dat", board);
-      display_board(board);
+      load_board("mystery3.dat", board);
       start = clock(); // for calculating speed of execution
       solve_board(board);
       stop = clock(); // for calculating speed of execution
@@ -54,9 +53,9 @@ int main() {
       count++;
     }
   cout << "Average number of recursive calls: " << (get_global_count() - 1) / (count - 1) << endl;
-  cout << "Average execution time: " << total_time / (count - 1) << endl;
+  cout << "Average execution time: " << total_time / (count - 1) << "ms" << endl;
   display_board(board);
-
+  
 
   return 0;
 }
