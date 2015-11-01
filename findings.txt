@@ -29,38 +29,43 @@ called.  A summary of the results is as follows:
 Calls:	    0	  0	 49,433	       3,108	  17,175
 
 As the program follows the same steps each time, there were no
-variances in the number of function calls.  The easy and medium boards were able to be
-solved through the process of deduction and elimination along, and therefore
-did not require any guessing / backtracking.
+variances in the number of function calls.  The easy and medium boards
+were able to be solved through the process of deduction and
+elimination alone, and therefore did not require any guessing /
+backtracking.
 
-This suggests the following conclusions:
+These results suggest the following conclusions:
 - Hard: mystery3
 - Extremely hard: mystery1
 - Impossible: mystery2
 
 While these tests provide a good indication of puzzle difficulty,
-there are cases where the results could be potentially skewed by number
-positioning.  For example. in cases where the first digits filled
-through recursion are high, this may potentially lead to more
-iterations being required before the correct solution is reached,
-despite there being no difference in puzzle difficulty.
+there are cases where the results could potentially be skewed by number
+positioning.  For example. in cases where the first squares to be filled
+by the recursive function contain high digits, this may potentially
+lead to more iterations being required before the correct solution is
+reached, despite there being no difference in puzzle difficulty vs. a
+puzzle with low digits in starting squares. 
 
 
 Summary of program:
-This program solves a Sudoku in two distinct sequential phases: (1) deduction and (2)
-recursion.  During the deduction phase, The board is modelled as a 3D array of booleans
-representing row, column and possible digits (in that order).  The function
-calculate_valid_digits(..) assigns a value of true to digits that can
-be validly placed in each square, with invalid digits marked false.
-For each row, column, box and square in turn, the board is updated to reflect
-digits which can only validly be placed in one square.  This process
-is repeated until no more deductions are possible, at which point the
-board is passed into the recursive function fill_next_square(..) to
-test if it is complete or requires guessing.
+The program solves a Sudoku in two distinct sequential phases: (1)
+deduction and (2) recursion.  
+
+During the deduction phase, The board is modelled as a 3D array of
+booleans representing row, column and possible digits (in that order).
+The function calculate_valid_digits(..) assigns a value of true to
+digits that can be validly placed in each square, with invalid digits
+marked false. For each row, column, box and square in turn, the board
+is updated to reflect digits which can only validly be placed in one
+square.  This process is repeated until no more deductions are
+possible, at which point the board is passed into the recursive
+function fill_next_square(..) to test if it is complete or requires
+guessing.
 
 During the recursive phase, the program attempts to fill all remaining
-empty squares with a valid digit.  The function get_next_square(..) is used
-to find the next empty square, which is then assigned the value
+empty squares with a valid digit.  The function get_next_square(..) is
+used to find the next empty square, which is then assigned the value
 of the lowest digit that can be validly placed in it.  The function
 fill_next_square(..) is then called again.  This is repeated until
 either (i) the board is complete (function returns true) or (ii) there
@@ -69,12 +74,14 @@ indicating a mistake in an earlier digit assignemnt.  In the case of
 the latter, the program moves back to the most recently assigned
 square and attempts to places the next highest valid digit in that
 square (if there is one). If there is no valid solution, the function
-returns false (when there are no more valid digits that can be placed in square [0][0]).
+returns false (when there are no more valid digits that can be place
+in square [0][0]).
 
 
 Efficiency vs. brute force algorithm:
 As a comparison, equivalent tests were run for a purely recursive
-function (with no prior digit deduction).  The results are as follows:
+function (with no prior digit deduction phase).  The results were as
+follows:
 
 Average calculation time (ms):
 	    easy  medium mystery1      mystery2	  mystery3
@@ -94,5 +101,5 @@ Relative efficiency vs. brute force:
 Time:	    62%	  90%     95%	       N/M        92%
 Calls:	    NM	  NM	  95%	       NM	  93%
 
-This indicates efficiency and speed improvements of >90% vs. a brute
-force solution.
+This suggests efficiency and speed improvements of >90% vs. a brute
+force solution in most cases.
