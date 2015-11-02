@@ -14,4 +14,4 @@ unit_test.o: unit_test.cpp sudoku.h
 	g++ -g -c unit_test.cpp
 
 clean:
-	rm -rf sudoku *.o unit_test
+	rm -rf sudoku *.o unit_test temp.dat

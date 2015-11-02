@@ -8,7 +8,7 @@
 
 using namespace std;
 
-int global_count(0); // counts the number of times the recursive function is called to reach a solution
+int global_count(0); // counts the number of recursive calls to find a solution
 
 /* You are pre-supplied with the functions below. Add your own 
    function definitions to the end of this file. */
@@ -71,24 +71,22 @@ void display_board(const char board[9][9]) {
   print_frame(9);
 }
 
-/* function which returns true if all Sudoku board positions are occupied by digits, and false otherwise.  N.B: no check for whether digits are logically valid. */
 bool is_complete(const char board[9][9]) {
-  for (int r=0; r<9; r++) // for each row
+  for (int r=0; r<9; r++)
     {
-      for (int c=0; c<9; c++) // for each column
+      for (int c=0; c<9; c++) 
 	{
 	  if (board[r][c] == '0' || !isdigit(board[r][c]))
-	    return false;  // returns false if position does not hold a digit or if digit is '0' (not permitted)
+	    return false;  // false if no digit in square or if digit is '0'
 	}
     }
-  return true; // returns true if all of the columns and rows have been tested and all contain digits
+  return true; // returns true if all squares contain digits
 }
 
-/* function which attempts to place a digit onto a Sudoku board at a given position (consisting of a 2 character string denoting row and column coordinates).  Returns true if the placing of the digit at position is valid (and updates board), otherwise returns false (and board is unaltered)*/
 bool make_move(const char *position, const char digit, char board[9][9])
 {
-  int row = position[0] - 'A'; // Converts the first char in 'position' to integer row array index
-  int column = position[1] - '1'; // Converts the second char in 'position' to integer column array index
+  int row = position[0] - 'A'; //Converts 1st char in 'position' to row index
+  int column = position[1] - '1';//Converts 2nd char in 'position' to col index
 
   if (!check_valid(row, column, digit, board)) // checks move is valid
     return false;
@@ -98,17 +96,16 @@ bool make_move(const char *position, const char digit, char board[9][9])
 
 }
 
-/* function which outputs the 2D character array board to a file with name 'filename'.  Return true if file written successfully, otherwise false */
 bool save_board(const char *filename, const char board[9][9]) {
   ofstream out(filename);
   int row = 0;
 
   if (!out)
-    return false;  // No assert as no need to exit the program if the file save not successful
+    return false;  //No assert as no need to exit the program if save fails
 
   while (out && row < 9) {
     for (int n=0; n<9; n++)
-      out.put(board[row][n]); // No assert as no need to exit the program if the file save not successful
+      out.put(board[row][n]);
     out.put('\n');
     row++;
   }
@@ -117,25 +114,16 @@ bool save_board(const char *filename, const char board[9][9]) {
   return ((row == 9) ? true : false);
 }
 
-
-/* function which attempts to solve the Sudoku puzzle in board.  Return value is true if a solution is found (and board contains final solution) or false if no solution exists (board unchanged)  */
 bool solve_board(char board[9][9])
 {
-  bool solution_found(false); // returns true if there is a potential solution, otherwise false
-  int board_sum_before = sum_board(board);
-  int board_sum_after(0), difference(0);
+  bool solution_found(false); //Value will be set to true if a solution exists
 
-  save_board("temp.dat", board); // Needed in case no solution found (so board to returned to unchanged state)
+  save_board("temp.dat", board); //Original board saved in case no solution
   
-  do
-    {
-      deduce_digits(board);
-      board_sum_after = sum_board(board);
-      difference = board_sum_after - board_sum_before;
-      board_sum_before = board_sum_after;
-    } while(!is_complete(board) && difference != 0); // keep trying to make deductions until either the board is complete or there are no further deductions possible
+  deduce_digits(board); //Make any deductions possible
   
-  solution_found = fill_next_square(board); // call fill_next_square(..) which will either return true (if board is complete) or false (if no solution found)
+  solution_found = fill_next_square(board); 
+  // returns true (if board is complete) or false (if no solution found)
 
   if(!solution_found) // Return board to initial state if no solution found
     load_board("temp.dat", board);
@@ -143,7 +131,6 @@ bool solve_board(char board[9][9])
   return solution_found;
 }
 
-/* function which tests if board is complete (returns true), and if not, attempts to fill the next empty square */
 bool fill_next_square(char board[9][9])
 {
   global_count++; // counter for number of times recursive function called
@@ -151,43 +138,43 @@ bool fill_next_square(char board[9][9])
   char position[2];
   char attempt = '1'; // start search with digit '1'
 
-  if(is_complete(board)) // tests if the board is complete - if so, solution found, return true
+  if(is_complete(board))
     {
       return true;
     }
 
-  get_next_empty_square(row, column, board); // finds the row and column of the next empty square
+  get_next_empty_square(row, column, board);//sets row/col of next empty square
 
+  //Convert next empty square row/col to string for input to make_move(..):
   position[0] = row + 'A';
-  position[1] = column + '1'; // Begin search in the top left square
+  position[1] = column + '1';
 
   while(attempt <= '9')
     {
-      if(make_move(position, attempt, board)) //tests if the digit can be validly placed in the square
+      if(make_move(position, attempt, board))//if digit can be validly placed
 	{
-	  if(fill_next_square(board)) // if valid, move onto the next square
+	  if(fill_next_square(board)) // move onto the next square
 	     return true;
 	}
       attempt++;
     }
 
-  if(attempt > '9') // if no valid digits can be placed in the board, square set to blank
+  if(attempt > '9') // no valid digits can be placed, set square set to blank
     {
       board[row][column] = '.';
       return false; // moves back to previous cell filled
     }
 }
 
-/* function returns true if the digit is invalid (i.e. not a char between 1 and 9) */
 bool invalid_digit(const char digit)
 {
-  if (static_cast<int>(digit) > 57 || static_cast<int>(digit) < 49) // '1' = 49 (ASCII), '9' = 57 (ASCII)
+  // '1' = 49 (ASCII), '9' = 57 (ASCII)
+  if (static_cast<int>(digit) > 57 || static_cast<int>(digit) < 49)
     return true;
   else
     return false;
 }
 
-/* function returns true if test coordinate is out of range */
 bool out_of_range(const int row, const int column)
 {
   if ((row > 8 || row < 0) || (column > 8 || column < 0))
@@ -196,7 +183,6 @@ bool out_of_range(const int row, const int column)
     return false;
 }
 
-/* function returns true if digit already appears in the same row */
 bool duplicate_digit_in_row(const int row, const char digit, char board[9][9])
 {
   for (int c = 0; c < 9; c++)
@@ -207,7 +193,6 @@ bool duplicate_digit_in_row(const int row, const char digit, char board[9][9])
   return false;
 }
 
-/* function returns true if digit already appears in the same column */
 bool duplicate_digit_in_column(const int column, const char digit, char board[9][9])
 {
   for (int r = 0; r < 9; r++)
@@ -218,11 +203,10 @@ bool duplicate_digit_in_column(const int column, const char digit, char board[9]
   return false;
 }
 
-/* function returns true if digit already appears in the same 3x3 box */
 bool duplicate_digit_in_box(const int row, const int column, const char digit, char board[9][9])
 {
-  int test_row = (row / 3) * 3; // converts row to a value of either 0, 3 or 6 to test box
-  int test_column = (column / 3) * 3; // converts column to a value of either 0, 3 or 6 to test box
+  int test_row = (row / 3) * 3; // converts row to 0, 3 or 6
+  int test_column = (column / 3) * 3; // converts column to 0, 3 or 6
 
   for (int r = test_row; r < (test_row + 3); r++)
     {
@@ -235,7 +219,6 @@ bool duplicate_digit_in_box(const int row, const int column, const char digit, c
   return false;
 }
 
-/* function returns true if digit can be validly placed in the square indicated by row and column in board.  Otherwise returns false. */
 bool check_valid(const int row, const int column, const char digit, char board[9][9])
 {
   if (invalid_digit(digit))
@@ -256,7 +239,6 @@ bool check_valid(const int row, const int column, const char digit, char board[9
   return true;
 }
 
-/* function returns the row and column coordinates of the next square of board which does not contain a digit */
 void get_next_empty_square(int &row, int &column, char board[9][9])
 {
   if(!isdigit(board[0][0])) // case where top left square is empty
@@ -270,71 +252,84 @@ void get_next_empty_square(int &row, int &column, char board[9][9])
       row++; // if square contains a digit, and row < 9, increment row
       if(row == 9 && column < 9)
 	{
-	  row = 0; // one the end of the rows reaches, increment column and reset row
+	  row = 0; // when no more rows, increment column and reset row
 	  column++;
 	}
     }
 }
 
-/* function initialises a 3D boolean array to false throughout */
 void fill_with_false(bool valid_digits[9][9][9])
 {
   for(int r=0; r<9; r++)
     {
       for(int c=0; c<9; c++)
 	{
-	  for(int d=0; d<9; d++) // for all digits
+	  for(int d=0; d<9; d++) // d represent digits '1' to '9'
 	    valid_digits[r][c][d] = false;
 	}
     }
 }
 
-/* function sets values in the 3D array valid_digits to true based based on whether the digit could be validly placed (based on existing state of board). */
 void calculate_valid_digits(bool valid_digits[9][9][9], char board[9][9])
 {
-  int digit_position; // represents the position in the array of digit (in the third dimension). E.g digit '1' occupies space 0, up to digit '9' in space 8
+  int digit_position;
+  // Represents array position of digit (in 3rd dimension).
+  // e.g digit '1' occupies space 0, up to digit '9' in space 8
+
   char test_value;
-  for(int r=0; r<9; r++) // for each row
+  for(int r=0; r<9; r++)
     {
-      for(int c=0; c<9; c++) // for each column
+      for(int c=0; c<9; c++)
 	{
-	  if(isdigit(board[r][c])) // if board already contains a value
+	  if(isdigit(board[r][c]))//if square in board already contains a digit
 	    {
 	      digit_position = board[r][c] - '1';
-	      valid_digits[r][c][digit_position] = true; // set corresponding position in third dimension to true (represents that digit)
+	      valid_digits[r][c][digit_position] = true; 
+	      //set corresponding boolean in valid_digits to true
 	    }
 	  else
 	    {
 	      test_value = '1';
-	      while(test_value <= '9') // otherwise, iterate through possible digits and set valid ones to true in the third dimension of the 3D array for that row & column
+	      while(test_value <= '9')
 		{
 		  if(check_valid(r, c, test_value, board))
 		    {
 		      digit_position = test_value - '1';
-		      valid_digits[r][c][digit_position] = true; // set appropriate digit position to true
+		      valid_digits[r][c][digit_position] = true; 
+		      // set all valid digits to true
 		    }
-		  test_value++; // test next digit, until '9' reached
+		  test_value++; 
 		}
 	    }
 	}
     }
 }
 
-/* function tests whether digits can be added to the board through deduction */
 void deduce_digits(char board[9][9])
 {
-  deduce_in_row(board);
-  deduce_in_column(board);
-  deduce_in_box(board);
-  deduce_from_valid_digits(board);
+  int board_sum_before = sum_board(board);
+  int board_sum_after(0), difference(0);
+
+  do
+    {
+      deduce_in_row(board);
+      deduce_in_column(board);
+      deduce_in_box(board);
+      deduce_from_valid_digits(board);
+
+      board_sum_after = sum_board(board);
+      difference = board_sum_after - board_sum_before; //check if any changes
+      board_sum_before = board_sum_after;
+    } while(!is_complete(board) && difference != 0); 
 }
 
-/* function updates the board for any values which can be deduced on a row by row basis. Each digit is considered in turn and, for each row, if there is only one square which can be validly hold that digit, the board is updated to reflect this */
 void deduce_in_row(char board[9][9])
 {
   char digit;
   int position(0), count(0);
-  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+  bool valid_digits[9][9][9]; 
+  // 1st 2 dimensions represent row and column (of the Sudoku board).  
+  // 3rd dimension represents the digits '1' to '9'
 
   fill_with_false(valid_digits);
   calculate_valid_digits(valid_digits, board);
@@ -343,17 +338,17 @@ void deduce_in_row(char board[9][9])
     {
       for(int r=0; r<9; r++)
 	{
-	  digit = d + '1'; // convert d to an equivalent char (i.e. d = 0 implies char '1')
-	  if(!duplicate_digit_in_row(r, digit, board)) // tests if row already contains that digit
+	  digit = d + '1'; // convert d to equivalent char (e.g d = 0 -> '1')
+	  if(!duplicate_digit_in_row(r, digit, board)) //test if row contains
 	    {
 	      for(int c=0; c<9; c++)
 		{
-		  count += valid_digits[r][c][d]; // count number of squares in row which can validly hold digit
+		  count += valid_digits[r][c][d];
 		  if(valid_digits[r][c][d])
-		    position = c; // remember the column of the last square which can validly hold digit
+		    position = c;//note column of square that can hold digit
 		} 
-	      if(count == 1) // if only one valid position in the row for the digit
-		board[r][position] = digit;
+	      if(count == 1) //if only one valid position in row for the digit
+		board[r][position] = digit; // assign square the digit
 	      position = 0;
 	      count = 0;	      
 	    }
@@ -361,12 +356,11 @@ void deduce_in_row(char board[9][9])
     }
 }
 
-/* function updates the board for any values which can be deduced on a column by column basis. Each digit is considered in turn and, for each column, if there is only one square which can be validly hold that digit, the board is updated to reflect this */
 void deduce_in_column(char board[9][9])
 {
   char digit;
   int position(0), count(0);
-  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+  bool valid_digits[9][9][9];
 
   fill_with_false(valid_digits);
   calculate_valid_digits(valid_digits, board);
@@ -375,59 +369,57 @@ void deduce_in_column(char board[9][9])
     {
       for(int c=0; c<9; c++)
 	{
-	  digit = d + '1'; // convert d to an equivalent char (i.e. d = 0 implies char '1')
-	  if(!duplicate_digit_in_column(c, digit, board)) // tests if column already contains that digit
+	  digit = d + '1'; // convert d to equivalent char (e.g d = 0 -> '1')
+	  if(!duplicate_digit_in_column(c, digit, board))//test if column has
 	    {
 	      for(int r=0; r<9; r++)
 		{
-		  count += valid_digits[r][c][d]; // count number of squares in column which can validly hold digit
+		  count += valid_digits[r][c][d];
 		  if(valid_digits[r][c][d])
-		    position = r; // remember the row of the last square which can validly hold digit
+		    position = r; //note row of square that can hold digit
 		} 
-	      if(count == 1) // if only one valid position in the column for the digit
-		board[position][c] = digit;
+	      if(count == 1) //if only one valid position in col for the digit
+		board[position][c] = digit; // assign square the digit
 	      position = 0;
 	      count = 0;	      
 	    }
 	}
     }
-
 }
 
-
-/* function updates the board for any values which can be deduced on a box by box basis. Each digit is considered in turn and, for each box, if there is only one square which can be validly hold that digit, the board is updated to reflect this */
 void deduce_in_box(char board[9][9])
 {
   char digit;
   int row_position(0), column_position(0), count(0);
   int test_row(0), test_column(0);
-  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+  bool valid_digits[9][9][9];
 
   fill_with_false(valid_digits); 
   calculate_valid_digits(valid_digits, board);
 
-  for(int test_row = 0; test_row < 9; test_row = test_row + 3) // top left row of each box
+  //starting at top left square of each box
+  for(int test_row = 0; test_row < 9; test_row = test_row + 3)
     {
-      for(int test_column = 0; test_column < 9; test_column = test_column + 3) // top left column of each box
+      for(int test_column = 0; test_column < 9; test_column = test_column + 3)
 	{
 	  for(int d=0; d<9; d++)
 	    {
-	      digit = d + '1'; // convert d to an equivalent char (i.e. d = 0 implies char '1')
-	      if(!duplicate_digit_in_box(test_row, test_column, digit, board)) // tests if box already contains that digit
+	      digit = d + '1';
+	      if(!duplicate_digit_in_box(test_row, test_column, digit, board))
 		{
 		  for(int r = test_row; r < test_row + 3; r++)
 		    {
 		      for(int c = test_column; c < (test_column + 3); c++)
 			{
-			  count += valid_digits[r][c][d]; // count number of squares in box which can validly hold digit
+			  count += valid_digits[r][c][d];
 			  if(valid_digits[r][c][d])
 			    {
 			      row_position = r;
-			      column_position = c; // remember row and column of last square which can validly hold digit
+			      column_position = c;//note square which can hold
 			    }
 			}
 		    }
-		  if(count == 1) // if only one valid position in the box for the digit
+		  if(count == 1)//if only one valid position in box for digit
 		    board[row_position][column_position] = digit;
 		  row_position = column_position = 0;
 		  count = 0;	      
@@ -437,12 +429,11 @@ void deduce_in_box(char board[9][9])
     }
 }		
 
-/* function updates the board for any values which can be deduced on a square by square basis. For each square in turn, the potentially valid digits are calculated.  If there is only one valid digit for that square, the board is updated to reflect this */
 void deduce_from_valid_digits(char board[9][9])
 {
   char digit;
   int position(0), count(0);
-  bool valid_digits[9][9][9]; // a 3D array: the first two dimensions represent row and column (of the Sudoku board) and the third dimension represents the digits '1' to '9'
+  bool valid_digits[9][9][9];
 
   fill_with_false(valid_digits); 
   calculate_valid_digits(valid_digits, board); 
@@ -451,11 +442,11 @@ void deduce_from_valid_digits(char board[9][9])
     {
       for(int c=0; c<9; c++)
 	{
-	  if(!isdigit(board[r][c])) // tests if square already contains a digit
+	  if(!isdigit(board[r][c])) //tests if square already contains a digit
 	    {
 	      for(int d=0; d<9; d++)
 		{
-		  count += valid_digits[r][c][d]; // count number of digits which can validly inserted into square
+		  count += valid_digits[r][c][d];
 		  if(valid_digits[r][c][d])
 		    position = d; // remember the last valid digit
 		}
@@ -468,7 +459,6 @@ void deduce_from_valid_digits(char board[9][9])
     }
 }
 
-/* function sums to total value of characters in the board and returns this value */
 int sum_board(const char board[9][9])
 {
   int sum(0);
@@ -481,7 +471,6 @@ int sum_board(const char board[9][9])
   return sum;
 }
 
-/* function returns the total number of recursive calls to reach a solution */
 int get_global_count()
 {
   return global_count;

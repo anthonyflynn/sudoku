@@ -13,13 +13,13 @@ and the time averaged. A summary of the results is as follows:
 
 Average calculation time (ms):
 	    easy  medium mystery1      mystery2	  mystery3
-Test 1:	    0.89  1.12	 48.34	       None	  18.23
-Test 2:	    0.88  1.21	 46.30	       None	  19.49
-Test 3:	    0.91  1.39	 47.89	       None	  19.86
-Test 4:	    0.91  1.65	 47.85	       None	  21.35
-Test 5:	    0.92  1.01	 46.05	       None	  23.56
+Test 1:	    0.32  0.69	 27.63	       None	  10.51
+Test 2:	    0.37  0.63	 26.66	       None	  11.31
+Test 3:	    0.31  0.59	 26.32	       None	  10.98
+Test 4:	    0.36  0.60	 26.49	       None	  10.34
+Test 5:	    0.37  0.68	 27.99	       None	  11.15
 
-Average:    0.90  1.28	 47.29	       None	  20.51
+Average:    0.35  0.64	 27.02	       None	  10.86
 
 Additionally, a global variable was declared and incremented
 each time the recursive function fill_next_square(..) was
@@ -85,20 +85,20 @@ follows:
 
 Average calculation time (ms):
 	    easy  medium mystery1      mystery2	  mystery3
-Test 1:	    2.23  15.73	 974.06	       None	  274.38
-Test 2:	    2.17  12.23	 974.62	       None	  272.14
-Test 3:	    2.36  13.64	 971.72	       None	  275.73
-Test 4:	    2.51  11.85	 966.67	       None	  270.47
-Test 5:	    2.48  12.25	 973.34	       None	  272.51
+Test 1:	    0.75  6.18	 583.15	       None	  138.05
+Test 2:	    0.72  6.14	 504.63	       None	  139.78
+Test 3:	    0.73  6.12	 515.83	       None	  145.20
+Test 4:	    0.75  6.51	 523.48	       None	  140.31
+Test 5:	    0.79  6.15	 517.61	       None	  138.92
 
-Average:    2.35  13.14	 972.08	       None	  273.05
+Average:    0.75  6.22	 528.94	       None	  140.45
 
 Recusive calls:
 Calls:	    1153  10676	 958117	       7507	  251987
 
 
 Relative efficiency vs. brute force:
-Time:	    62%	  90%     95%	       N/M        92%
+Time:	    47%	  90%     95%	       NM         92%
 Calls:	    NM	  NM	  95%	       NM	  93%
 
 This suggests efficiency and speed improvements of >90% vs. a brute
