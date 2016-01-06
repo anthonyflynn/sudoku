@@ -7,12 +7,10 @@
 using namespace std;
 
 int main() {
-  /*
-  // PROGRAM FOR DEMONSTRATING FUNCTION:
   char board[9][9];
   char file[80]; // max filename of 79 charaters
 
-  cout << "Program which finds the solution to Sudoku puzzles." << endl;
+  cout << "Program finds the solution to Sudoku puzzles." << endl;
   cout << "Please enter the filename of the Sudoku to be solved: ";
   cin >> file;
 
@@ -31,14 +29,12 @@ int main() {
   cout << "Total recursive calls required: " << get_global_count() << endl;
   cout << "Please enter a filename to save the solution: ";
   cin >> file;
-  if (save_board(file, board))
-    cout << "Save board to '" << file << "' successful." << endl;
-  else
+  if (!save_board(file, board)) {
     cout << "Save board failed." << endl;
+  }
   cout << endl;
-  */
-  
-  // PROGRAM FOR TESTING:
+
+  /* PROGRAM FOR TESTING:
   int start, stop, count(1), recursive_calls(0);
   double total_time(0);
   char board[9][9];
@@ -62,6 +58,8 @@ int main() {
        << "ms" << endl;
   cout << "Board solution: " << endl;
   display_board(board);
+
+  */
 
   return 0;
 }

@@ -8,16 +8,9 @@
 
 using namespace std;
 
-int global_count(0); // counts the number of recursive calls to find a solution
+int global_count(-1); // counts number of recursive calls for solution
 
-/* You are pre-supplied with the functions below. Add your own 
-   function definitions to the end of this file. */
-
-/* pre-supplied function to load a Sudoku board from a file */
 void load_board(const char *filename, char board[9][9]) {
-
-  cout << "Loading Sudoku board from file '" << filename << "'... ";
-
   ifstream in(filename);
   if (!in)
     cout << "Failed!" << endl;
@@ -36,7 +29,6 @@ void load_board(const char *filename, char board[9][9]) {
     in.getline(buffer,512);
   }
 
-  cout << ((row == 9) ? "Success!" : "Failed!") << endl;
   assert(row == 9);
 }
 
@@ -58,7 +50,6 @@ void print_row(const char *data, int row) {
   cout << "|" << endl;
 }
 
-/* pre-supplied function to display a Sudoku board */
 void display_board(const char board[9][9]) {
   cout << "    ";
   for (int r=0; r<9; r++) 

@@ -1,4 +1,7 @@
+/* function to load a Sudoku board from a file */
 void load_board(const char *filename, char board[9][9]);
+
+/* function to display a Sudoku board */
 void display_board(const char board[9][9]);
 
 /* function which returns true if all Sudoku board positions are occupied by 
